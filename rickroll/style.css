@@ -1,0 +1,24 @@
+body {
+	background-color: lightblue;
+}
+
+#title {
+	background-color: yellow;
+	border: dashed;
+	color: blue;
+	font-family: "Comic Sans MS";
+	font-size: 36px;
+	text-align: center;
+}
+
+#rickroll {
+	display: block;
+	margin: auto;
+}
+
+#lyrics {
+	color: blue;
+	font-family: "Comic Sans MS";
+	font-size: 24px;
+	text-align: center;
+}
