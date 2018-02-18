@@ -10,8 +10,8 @@ Last edited: 02/18/18
 ## A. Overview
 
 The assignment consisted of embedding a video in a web page using the HTML5
-<video> tag and using JavaScript to show live lyrics on the screen as the 
-video played.
+video element and using JavaScript to show live lyrics on the screen as the 
+video is played.
 
 ## B. Implementation
 
