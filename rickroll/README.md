@@ -23,4 +23,4 @@ I did not collaborate with anyone on this assignment.
 
 ## D. Time spent
 
-I think I spent around 1.5 hours on this assignment.
+I think I spent around 2 hours on this assignment.
