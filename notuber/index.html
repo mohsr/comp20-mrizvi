@@ -14,6 +14,7 @@
 			var whereami;
 			var opts;
 			var map;
+			var closest;
 
 			function init() {
 				getLocation();
@@ -26,12 +27,6 @@
 
 					getData();
 				});
-			}
-
-			function outputLocation() {
-				locElem = document.getElementById("myloc");
-				locElem.innerHTML = "<h3>You are at " + lat + ", " + 
-				                   lng + "</h3>"
 			}
 
 			function getData() {
@@ -67,30 +62,43 @@
 				map = new google.maps.Map(document.getElementById("map"), opts);
 				map.panTo(whereami);
 
+				dist = getDistanceToNearest();
 				myMarker = new google.maps.Marker({
 					position: whereami,
-					title: "Here you are!"
+					title: "<div class=\"unit\">Your username: " + user + "<br/>" +
+					       dist + "</div>"
 				});
 				myMarker.setMap(map);
 
-				info = new google.maps.InfoWindow();
+				myInfo = new google.maps.InfoWindow();
+				google.maps.event.addListener(myMarker, "click", function() {
+					myInfo.setContent(myMarker.title);
+					myInfo.open(map, myMarker);
+				});
 			}
 
-			function printJSON() {
-				dataElem = document.getElementById("data");
-				out = "";
+			function getDistanceToNearest() {
+				var closest;
 
 				for (i = 0; i < data[key].length; i++) {
-					out += "<p class=\"unit\">";
-					out += "Username: " + data[key][i].username + "</br>";
-					out += "Latitude: " + data[key][i].lat + "</br>";
-					out += "Longitude: " + data[key][i].lng + "</br>";
-					out += "</p>";
+					curr = new google.maps.LatLng(data[key][i].lat, data[key][i].lng);
+					currDist = google.maps.geometry.spherical.computeDistanceBetween(whereami, curr);
+					if ((currDist < closest) || (i == 0)) {
+						closest = currDist;
+					}
 				}
-				dataElem.innerHTML = out;
+
+				closest *= 0.000621371;
+
+				if (key == "vehicles") {
+					return ("Distance to nearest driver: " + closest);
+				} else {
+					return ("Distance to nearest passenger: " + closest);
+				}
 			}
+
 		</script>
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAT1NNtcXCNnupSRZVdfQBL_hbRg6X6FBI&callback=init"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAT1NNtcXCNnupSRZVdfQBL_hbRg6X6FBI&libraries=geometry&callback=init"></script>
 	</head>
 	<body>
 		<div id="map">
