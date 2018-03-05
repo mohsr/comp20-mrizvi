@@ -62,18 +62,29 @@
 				map = new google.maps.Map(document.getElementById("map"), opts);
 				map.panTo(whereami);
 
-				dist = getDistanceToNearest();
-				myMarker = new google.maps.Marker({
-					position: whereami,
-					title: "<div class=\"unit\">Your username: " + user + "<br/>" +
-					       dist + "</div>"
-				});
-				myMarker.setMap(map);
+				createMarker(whereami, user, getDistanceToNearest);
+				for (i = 0; i < data[key].length; i++) {
+					var loc = new google.maps.LatLng(data[key][i].lat, data[key][i].lng);
+					createMarker(loc, data[key][i].username, function() {
+						var distance = google.maps.geometry.spherical.computeDistanceBetween(whereami, loc);
+	
+						return ("Distance to you: " + (distance * 0.000621371))
+					});
+				}
+			}
 
-				myInfo = new google.maps.InfoWindow();
-				google.maps.event.addListener(myMarker, "click", function() {
-					myInfo.setContent(myMarker.title);
-					myInfo.open(map, myMarker);
+			function createMarker(pos, name, distFunc) {
+				var marker = new google.maps.Marker({
+					position: pos,
+					title: "<div class=\"unit\">Username: " + name + "<br/>" +
+					       distFunc() + "</div>"
+				});
+				marker.setMap(map);
+
+				info = new google.maps.InfoWindow();
+				google.maps.event.addListener(marker, "click", function() {
+					info.setContent(marker.title);
+					info.open(map, marker);
 				});
 			}
 
