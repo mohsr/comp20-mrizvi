@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Not Uber</title>
+		<meta name="viewport" content="initial-scale=1.0">
+		<meta charset="utf-8">
+		<script>
+			var lat = 9999;
+			var lng = 9999;
+
+			function getLocation() {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					lat = position.coords.latitude;
+					lng = position.coords.longitude;
+
+					outputLocation();
+				});
+			}
+
+			function outputLocation() {
+				elem = document.getElementById("myloc");
+				elem.innerHTML = "<h3>You are at " + lat + ", " + lng + "</h3>"
+			}
+		</script>
+	</head>
+	<body onload="getLocation()">
+		<div id="myloc">
+		</div>
+	</body>
+</html>
