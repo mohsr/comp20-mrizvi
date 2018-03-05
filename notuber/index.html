@@ -6,7 +6,8 @@
 		<meta charset="utf-8">
 		<link href="style.css" rel="stylesheet">
 		<script>
-			var user = "22CM1fog3P";
+			// var user = "22CM1fog3P";
+			var user = "K9m65WRQyh";
 			var lat  = 9999;
 			var lng  = 9999;
 			var data;
@@ -15,10 +16,6 @@
 			var opts;
 			var map;
 			var closest;
-
-			function init() {
-				getLocation();
-			}
 
 			function getLocation() {
 				navigator.geolocation.getCurrentPosition(function(position) {
@@ -62,22 +59,30 @@
 				map = new google.maps.Map(document.getElementById("map"), opts);
 				map.panTo(whereami);
 
-				createMarker(whereami, user, getDistanceToNearest);
+				if (key == "vehicles") {
+					otherIcon = "resources/car.png";
+				} else {
+					otherIcon = "resources/person.png";
+				}
+
+				createMarker(whereami, user, getDistanceToNearest, "resources/me.png");
+
 				for (i = 0; i < data[key].length; i++) {
 					var loc = new google.maps.LatLng(data[key][i].lat, data[key][i].lng);
 					createMarker(loc, data[key][i].username, function() {
 						var distance = google.maps.geometry.spherical.computeDistanceBetween(whereami, loc);
 	
 						return ("Distance to you: " + (distance * 0.000621371))
-					});
+					}, otherIcon);
 				}
 			}
 
-			function createMarker(pos, name, distFunc) {
+			function createMarker(pos, name, distFunc, img) {
 				var marker = new google.maps.Marker({
 					position: pos,
 					title: "<div class=\"unit\">Username: " + name + "<br/>" +
-					       distFunc() + "</div>"
+					       distFunc() + "</div>",
+					icon: img
 				});
 				marker.setMap(map);
 
@@ -109,7 +114,7 @@
 			}
 
 		</script>
-		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAT1NNtcXCNnupSRZVdfQBL_hbRg6X6FBI&libraries=geometry&callback=init"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAT1NNtcXCNnupSRZVdfQBL_hbRg6X6FBI&libraries=geometry&callback=getLocation"></script>
 	</head>
 	<body>
 		<div id="map">
