@@ -5,8 +5,11 @@
 		<meta name="viewport" content="initial-scale=1.0">
 		<meta charset="utf-8">
 		<script>
-			var lat = 9999;
-			var lng = 9999;
+			var user = "22CM1fog3P";
+			var lat  = 9999;
+			var lng  = 9999;
+			var data;
+			var key;
 
 			function getLocation() {
 				navigator.geolocation.getCurrentPosition(function(position) {
@@ -14,17 +17,54 @@
 					lng = position.coords.longitude;
 
 					outputLocation();
+					getData();
 				});
 			}
 
 			function outputLocation() {
-				elem = document.getElementById("myloc");
-				elem.innerHTML = "<h3>You are at " + lat + ", " + lng + "</h3>"
+				locElem = document.getElementById("myloc");
+				locElem.innerHTML = "<h3>You are at " + lat + ", " + 
+				                   lng + "</h3>"
+			}
+
+			function getData() {
+				var req = new XMLHttpRequest;
+				req.open("POST", "https://jordan-marsh.herokuapp.com/rides",
+					     true);
+				req.setRequestHeader("Content-type", 
+					                 "application/x-www-form-urlencoded");
+				req.onreadystatechange = function() {
+					if (req.readyState == 4 && req.status == 200) {
+						data = JSON.parse(req.responseText);
+						outputData();
+					}
+				}
+				req.send("username=" + user + "&lat=" + lat + "&lng=" + lng);
+			}
+
+			function outputData() {
+				dataElem = document.getElementById("data");
+				out = "";
+
+				if (data.hasOwnProperty("vehicles")) {
+					key = "vehicles";
+				} else {
+					key = "passengers";
+				}
+
+				for (i = 0; i < data[key].length; i++) {
+					out += "<p class=\"unit\">";
+					out += "Username: " + data[key][i].username + "</br>";
+					out += "Latitude: " + data[key][i].lat + "</br>";
+					out += "Longitude: " + data[key][i].lng + "</br>";
+					out += "</p>";
+				}
+				dataElem.innerHTML = out;
 			}
 		</script>
 	</head>
 	<body onload="getLocation()">
-		<div id="myloc">
-		</div>
+		<div id="myloc"></div>
+		<div id="data"></div>
 	</body>
 </html>
