@@ -4,19 +4,26 @@
 		<title>Not Uber</title>
 		<meta name="viewport" content="initial-scale=1.0">
 		<meta charset="utf-8">
+		<link href="style.css" rel="stylesheet">
 		<script>
 			var user = "22CM1fog3P";
 			var lat  = 9999;
 			var lng  = 9999;
 			var data;
 			var key;
+			var whereami;
+			var opts;
+			var map;
+
+			function init() {
+				getLocation();
+			}
 
 			function getLocation() {
 				navigator.geolocation.getCurrentPosition(function(position) {
 					lat = position.coords.latitude;
 					lng = position.coords.longitude;
 
-					outputLocation();
 					getData();
 				});
 			}
@@ -29,28 +36,49 @@
 
 			function getData() {
 				var req = new XMLHttpRequest;
-				req.open("POST", "https://jordan-marsh.herokuapp.com/rides",
-					     true);
-				req.setRequestHeader("Content-type", 
-					                 "application/x-www-form-urlencoded");
+				req.open("POST", "https://jordan-marsh.herokuapp.com/rides", true);
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				req.onreadystatechange = function() {
 					if (req.readyState == 4 && req.status == 200) {
 						data = JSON.parse(req.responseText);
-						outputData();
+						processData();
 					}
 				}
 				req.send("username=" + user + "&lat=" + lat + "&lng=" + lng);
 			}
 
-			function outputData() {
-				dataElem = document.getElementById("data");
-				out = "";
-
+			function processData() {
 				if (data.hasOwnProperty("vehicles")) {
 					key = "vehicles";
 				} else {
 					key = "passengers";
 				}
+
+				makeMap();
+			}
+
+			function makeMap() {
+				whereami = new google.maps.LatLng(lat, lng);
+				opts = {
+					zoom: 15,
+					center: whereami,
+					mapTypeId: google.maps.MapTypeId.ROADMAP
+				};
+				map = new google.maps.Map(document.getElementById("map"), opts);
+				map.panTo(whereami);
+
+				myMarker = new google.maps.Marker({
+					position: whereami,
+					title: "Here you are!"
+				});
+				myMarker.setMap(map);
+
+				info = new google.maps.InfoWindow();
+			}
+
+			function printJSON() {
+				dataElem = document.getElementById("data");
+				out = "";
 
 				for (i = 0; i < data[key].length; i++) {
 					out += "<p class=\"unit\">";
@@ -62,9 +90,11 @@
 				dataElem.innerHTML = out;
 			}
 		</script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAT1NNtcXCNnupSRZVdfQBL_hbRg6X6FBI&callback=init"></script>
 	</head>
-	<body onload="getLocation()">
-		<div id="myloc"></div>
-		<div id="data"></div>
+	<body>
+		<div id="map">
+			<h3>Loading map...</h3>
+		</div>
 	</body>
 </html>
