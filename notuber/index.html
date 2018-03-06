@@ -68,7 +68,7 @@
 					createMarker(loc, data[key][i].username, function() {
 						var distance = google.maps.geometry.spherical.computeDistanceBetween(whereami, loc);
 	
-						return ("Distance to you: " + (distance * 0.000621371));
+						return ("Distance to you: " + (distance * 0.000621371) + " miles");
 					}, otherIcon);
 				}
 			}
@@ -103,9 +103,9 @@
 				closest *= 0.000621371;
 
 				if (key == "vehicles") {
-					return ("Distance to nearest driver: " + closest);
+					return ("Distance to nearest driver: " + closest + " miles");
 				} else {
-					return ("Distance to nearest passenger: " + closest);
+					return ("Distance to nearest passenger: " + closest + " miles");
 				}
 			}
 
