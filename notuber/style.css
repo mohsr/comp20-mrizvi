@@ -3,8 +3,9 @@
 }
 
 #loadtext {
-	text-align: center;
 	color: blue;
+	font-family: "Comic Sans MS";
+	text-align: center;
 }
 
 .unit {
@@ -13,7 +14,6 @@
 }
 
 html, body {
-	background-color: gray;
 	height: 100%;
 	margin: 0;
 	padding: 0;
