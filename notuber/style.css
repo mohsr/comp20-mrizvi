@@ -2,12 +2,18 @@
 	height: 100%;
 }
 
+#loadtext {
+	text-align: center;
+	color: blue;
+}
+
 .unit {
 	text-align: center;
 	background-color: yellow;
 }
 
 html, body {
+	background-color: gray;
 	height: 100%;
 	margin: 0;
 	padding: 0;
