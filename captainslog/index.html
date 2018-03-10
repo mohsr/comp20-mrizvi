@@ -18,13 +18,12 @@
                 if (key.keyCode == 13) {
                     var data = "<h4>" + Date() + " - " + $("#msg").val() + "</h4>";
                     $("#msg").val("");
+                    
                     if (data.indexOf("<script>") != -1) {
                         return;
                     }
 
-                    if (stored == null) {
-                        stored = data;
-                    } else {
+                    if (stored != null) {
                         data += ("</br>" + stored);
                     }
 
