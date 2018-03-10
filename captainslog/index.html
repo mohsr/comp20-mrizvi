@@ -12,6 +12,7 @@
             $("#msg").keyup(function(key) {
                 if (key.keyCode == 13) {
                     var data = Date() + " - " + $("#msg").val();
+                    $("#log").prepend("<h4>" + data + "</h4>");
                 }
             })
         });
