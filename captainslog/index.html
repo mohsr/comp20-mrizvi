@@ -9,12 +9,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
+            var stored = localStorage.getItem("logs");
+            if (stored != null) {
+                $("#log").html(stored);
+            }
+
             $("#msg").keyup(function(key) {
                 if (key.keyCode == 13) {
-                    var data = Date() + " - " + $("#msg").val();
-                    $("#log").prepend("<h4>" + data + "</h4>");
+                    var data = "<h4>" + Date() + " - " + $("#msg").val() + "</h4>";
+                    $("#msg").val("");
+
+                    if (stored == null) {
+                        stored = data;
+                    } else {
+                        data += ("</br>" + stored);
+                    }
+
+                    stored = data;
+                    localStorage.setItem("logs", data);
+
+                    $("#log").html(data);
                 }
-            })
+            });
         });
     </script>
 </head>
