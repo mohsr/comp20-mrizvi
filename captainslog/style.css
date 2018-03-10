@@ -1,0 +1,14 @@
+body {
+	background-color: beige;
+}
+
+h1 {
+	font-family: "Papyrus";
+	text-align: center;
+	size: 24px;
+}
+
+h3, #msg, #log {
+	font-family: "Papyrus";
+	text-align: left;
+}
