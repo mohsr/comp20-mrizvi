@@ -6,7 +6,7 @@
 	<title>Mohsin Rizvi's Assignment 4</title>
 </head>
 <body>
-	<h2>Security Assessment</h1>
+	<h2>Security Assessment</h2>
 	<h3>Mohsin Rizvi</h3>
 	<h4>I. Introduction</h4>
 	<p>
@@ -18,31 +18,33 @@
 	<p>
 		I started with an analysis of the source code, and I noted down any 
 		potential vulnerabilities.
-		<ul>
-			<li>
-				I noticed that entries to the POST /rides route are not 
-				sanitized and are later given to the user via the GET / route 
-				and GET /vehicle.json routes, telling me of a potential
-				cross-site scripting vulnerability.
-			</li>
-			<li>
-				I noticed that the query strings given to the GET /vehicle.json 
-				route are not sanitized before being used as input in the 
-				MongoDB database. This tells me of a potential MongoDB/NoSQL
-				injection vulnerability.
-			</li>
-			<li>
-				I noticed that the main page, accessed through GET /, lists 
-				all passengers and the place they last made a request from. 
-				This stuck out to me as a privacy issue, as it allows anyone 
-				to access customer data.
-			</li>
-		</ul>
-
+	</p>
+	<ul>
+		<li>
+			I noticed that entries to the POST /rides route are not 
+			sanitized and are later given to the user via the GET / route 
+			and GET /vehicle.json routes, telling me of a potential
+			cross-site scripting vulnerability.
+		</li>
+		<li>
+			I noticed that the query strings given to the GET /vehicle.json 
+			route are not sanitized before being used as input in the 
+			MongoDB database. This tells me of a potential MongoDB/NoSQL
+			injection vulnerability.
+		</li>
+		<li>
+			I noticed that the main page, accessed through GET /, lists 
+			all passengers and the place they last made a request from. 
+			This stuck out to me as a privacy issue, as it allows anyone 
+			to access customer data.
+		</li>
+	</ul>
+	<p>
 		Where appropriate, I used curl to test POST exploits and Firefox for 
 		GET exploits.<br/>
 
 		Tools used included:
+	</p>
 		<ul>
 			<li>
 				Firefox for testing GET / and GET /vehicle.json.
@@ -51,7 +53,6 @@
 				curl for sending POST requests to POST /rides.
 			</li>
 		</ul>
-	</p>
 	<h4>III. Abstract of Findings</h4>
 	<p>
 		Overall, the vulnerabilities found were mostly technical injection 
@@ -65,121 +66,119 @@
 		sensitive information about all passengers who use the web application.
 	</p>
 	<h4>IV. Issues Found</h4>
-	<p>
-		<ul>
-			<li>
-				Issue: Cross-site Scripting <br/>
-				Location: JavaScript can be injected through the username 
-				field when executing POST /rides. This information is 
-				collected in server.js line 18 and is inserted into the 
-				database on line 36. It is reflected back through GET / at 
-				line 99.<br/>
-				Severity: High. A cross-site scripting vulnerability could 
-				allow an attacker to do many malicious things, such as 
-				stealing cookies and executing cryptocurrency-mining 
-				JavaScript. <br/>
-				Description: I found this issue upon inspecting the source code 
-				and seeing that unsanitized POST arguments are inserted into 
-				the database. JavaScript can be injected into the website 
-				through the POST /rides route as a username value. It can 
-				later be executed when accessing the GET / route, which will 
-				run the JavaScript on the browser of the user. See CWE-79 in 
-				section VI and pictures below.<br/>
-				Proof of vulnerability: See pictures below. <br/>
-				<img src="images/post_xss.png" /> <img src="images/get_xss.png" /> <br/>
-				Resolution: Sanitize inputs to prevent JavaScript injection. A
-				simple (yet somewhat draconic) example line of code to do this: <br/>
-				<code>if (username.includes('&lt;script&gt;')) {username = '';}</code> <br/>
-			</li>
-			<li>
-				Issue: MongoDB/NoSQL Injection <br/>
-				Location: MongoDB operators can be injected in query strings 
-				when executing GET /vehicle.json. The query string is collected 
-				in file server.js line 69, and it is used unsanitized in a 
-				query on line 75. <br/>
-				Severity: High. Due to the server software, only one entry is 
-				returned at a time, but this could still be used in repetition 
-				with different query values each time to potentially access 
-				many different documents in the database. For example: the 
-				query string "username[$ne]=mohsinrizvi" returns a single 
-				document for a user called JANET. But the string 
-				"username[$ne]=JANET" can then be used to get another document, 
-				and so on. A proof-of-concept is shown in the images below. <br/>
-				Description: I found this issue by inspecting the source code 
-				and seeing that the query strings are used unsanitized 
-				as database queries. Unsanitized query strings are used as input to 
-				a MongoDB query, which can include operators to access 
-				unintended data, leading to information leakage. See 
-				CWE-943 in section VI and images below. <br/>
-				Proof of vulnerability: See pictures below. <br/>
-				<img src="images/db_1.png" /> <img src="images/db_2.png" /> <br/>
-				Resolution: Sanitize database inputs to prevent MongoDB 
-				operator injection. A simple way to do this is as follows: <br/>
-				<code>if (query.includes('$')) {response.send({});}</code> <br/>
-			</li>
-			<li>
-				Issue: Passenger Information Exposure <br/>
-				Location: The GET / route sends the username of all passengers 
-				as well as the last place they requested a vehicle from, sorted 
-				by time. The data is formatted as HTML in file server.js on line 
-				99 and is sent on line 103. <br/>
-				Severity: High. The exposure could be exploited to track and 
-				locate users of the app, since it is sorted by time (so an 
-				attacker could identify someone's location exactly after they 
-				place a request). Additionally, people's ride activity in the 
-				long term can be tracked. <br/>
-				Description: The issue was easy to find: it is the entire 
-				purpose of the GET / route. Accessing the route gives a list of 
-				all the passengers, including their usernames and locations 
-				from which they called a vehicle. See CWE-359 in section VI 
-				as well as the image below. <br/>
-				Proof of vulnerability: See picture below. <br/>
-				<img src="images/get.png" /> <br/>
-				Resolution: Do not send this data through the GET / route, 
-				and instead use a route similar to GET /vehicle.json that 
-				accepts a username through a query string and returns the data 
-				associated with it. The queries should be sanitized to remove 
-				MongoDB operators. <br/>
-			</li>
-		</ul>
-	</p>
+	<ul>
+		<li>
+			Issue: Cross-site Scripting <br/>
+			Location: JavaScript can be injected through the username 
+			field when executing POST /rides. This information is 
+			collected in server.js line 18 and is inserted into the 
+			database on line 36. It is reflected back through GET / at 
+			line 99.<br/>
+			Severity: High. A cross-site scripting vulnerability could 
+			allow an attacker to do many malicious things, such as 
+			stealing cookies and executing cryptocurrency-mining 
+			JavaScript. <br/>
+			Description: I found this issue upon inspecting the source code 
+			and seeing that unsanitized POST arguments are inserted into 
+			the database. JavaScript can be injected into the website 
+			through the POST /rides route as a username value. It can 
+			later be executed when accessing the GET / route, which will 
+			run the JavaScript on the browser of the user. See CWE-79 in 
+			section VI and pictures below.<br/>
+			Proof of vulnerability: See pictures below. <br/>
+			<img src="images/post_xss.png" alt="Executing POST /rides with XSS" /> 
+			<img src="images/get_xss.png" alt="Executing GET / and experiencing XSS" /> <br/>
+			Resolution: Sanitize inputs to prevent JavaScript injection. A
+			simple (yet somewhat draconic) example line of code to do this: <br/>
+			<code>if (username.includes('&lt;script&gt;')) {username = '';}</code> <br/>
+		</li>
+		<li>
+			Issue: MongoDB/NoSQL Injection <br/>
+			Location: MongoDB operators can be injected in query strings 
+			when executing GET /vehicle.json. The query string is collected 
+			in file server.js line 69, and it is used unsanitized in a 
+			query on line 75. <br/>
+			Severity: High. Due to the server software, only one entry is 
+			returned at a time, but this could still be used in repetition 
+			with different query values each time to potentially access 
+			many different documents in the database. For example: the 
+			query string "username[$ne]=mohsinrizvi" returns a single 
+			document for a user called JANET. But the string 
+			"username[$ne]=JANET" can then be used to get another document, 
+			and so on. A proof-of-concept is shown in the images below. <br/>
+			Description: I found this issue by inspecting the source code 
+			and seeing that the query strings are used unsanitized 
+			as database queries. Unsanitized query strings are used as input to 
+			a MongoDB query, which can include operators to access 
+			unintended data, leading to information leakage. See 
+			CWE-943 in section VI and images below. <br/>
+			Proof of vulnerability: See pictures below. <br/>
+			<img src="images/db_1.png" alt="Image 1 of NoSQL injection" /> 
+			<img src="images/db_2.png" alt="Image 2 of NoSQL injection" /> <br/>
+			Resolution: Sanitize database inputs to prevent MongoDB 
+			operator injection. A simple way to do this is as follows: <br/>
+			<code>if (query.includes('$')) {response.send({});}</code> <br/>
+		</li>
+		<li>
+			Issue: Passenger Information Exposure <br/>
+			Location: The GET / route sends the username of all passengers 
+			as well as the last place they requested a vehicle from, sorted 
+			by time. The data is formatted as HTML in file server.js on line 
+			99 and is sent on line 103. <br/>
+			Severity: High. The exposure could be exploited to track and 
+			locate users of the app, since it is sorted by time (so an 
+			attacker could identify someone's location exactly after they 
+			place a request). Additionally, people's ride activity in the 
+			long term can be tracked. <br/>
+			Description: The issue was easy to find: it is the entire 
+			purpose of the GET / route. Accessing the route gives a list of 
+			all the passengers, including their usernames and locations 
+			from which they called a vehicle. See CWE-359 in section VI 
+			as well as the image below. <br/>
+			Proof of vulnerability: See picture below. <br/>
+			<img src="images/get.png" alt="Image of GET /" /> <br/>
+			Resolution: Do not send this data through the GET / route, 
+			and instead use a route similar to GET /vehicle.json that 
+			accepts a username through a query string and returns the data 
+			associated with it. The queries should be sanitized to remove 
+			MongoDB operators. <br/>
+		</li>
+	</ul>
 	<h4>V. Conclusion</h4>
 	<p>
 		In conclusion, the issues found largely dealt with unsanitized input 
 		and poor web application design that led to information exposure. The 
 		following recommendations are made for future development on the web 
 		application:
-		<ul>
-			<li>
-				When accepting inputs from the user, sanitize them as 
-				appropriate, either by checking for database operators or by 
-				not accepting scripts embedded in inputs. This is a low cost 
-				feature to implement and is a few lines of code at most.
-			</li>
-			<li>
-				Do not have information about users publicly available. This 
-				should only be accessible if proper validation is used. The 
-				information of a user should be accessible if and only if 
-				the privacy credentials of that user are provided. This 
-				requires a partial system redesign. This is a medium cost 
-				feature to implement, requiring several hours of time.
-			</li>
-		</ul>
 	</p>
+	<ul>
+		<li>
+			When accepting inputs from the user, sanitize them as 
+			appropriate, either by checking for database operators or by 
+			not accepting scripts embedded in inputs. This is a low cost 
+			feature to implement and is a few lines of code at most.
+		</li>
+		<li>
+			Do not have information about users publicly available. This 
+			should only be accessible if proper validation is used. The 
+			information of a user should be accessible if and only if 
+			the privacy credentials of that user are provided. This 
+			requires a partial system redesign. This is a medium cost 
+			feature to implement, requiring several hours of time.
+		</li>
+	</ul>
 	<h4>VI. References</h4>
-	<p>
-		<ul>
-			<li><a href="https://cwe.mitre.org/data/definitions/79.html">
-				CWE-79 - Cross-site Scripting
-			</a></li>
-			<li><a href="https://cwe.mitre.org/data/definitions/359.html">
-				CWE-359 - Exposure of Private Information
-			</a></li>
-			<li><a href="https://cwe.mitre.org/data/definitions/943.html">
-				CWE-943 - Improper Neutralization of Special Elements in 
-				Data Query Logic
-			</a></li>
-		</ul>
-	</p>
+	<ul>
+		<li><a href="https://cwe.mitre.org/data/definitions/79.html">
+			CWE-79 - Cross-site Scripting
+		</a></li>
+		<li><a href="https://cwe.mitre.org/data/definitions/359.html">
+			CWE-359 - Exposure of Private Information
+		</a></li>
+		<li><a href="https://cwe.mitre.org/data/definitions/943.html">
+			CWE-943 - Improper Neutralization of Special Elements in 
+			Data Query Logic
+		</a></li>
+	</ul>
 </body>
 </html>
